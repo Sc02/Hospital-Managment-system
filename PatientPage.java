@@ -5,6 +5,7 @@ import java.awt.event.*;
 public class PatientPage extends JFrame {
 
     private JPanel contentPane;
+    private LoginFrame loginFrame;
     private JTextField feedbackTextField;
     private JTextField doctorNameTextField;
 
@@ -79,10 +80,11 @@ public class PatientPage extends JFrame {
         pharmacyButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // Open the pharmacy page
-                PharmacyPage pharmacyPage = new PharmacyPage();
+                PharmacyPage pharmacyPage = new PharmacyPage(loginFrame);
                 pharmacyPage.setVisible(true);
             }
         });
+        
     }
 
     public static void main(String[] args) {
