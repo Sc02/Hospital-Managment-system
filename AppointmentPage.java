@@ -25,8 +25,15 @@ public class AppointmentPage extends JFrame {
         contentPane.setLayout(new BorderLayout());
         setContentPane(contentPane);
 
+        // Add title label
+        JLabel titleLabel = new JLabel("Book Your Appointment Here", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.PLAIN, 18)); // Set font
+        titleLabel.setForeground(Color.BLACK); // Set text color
+        titleLabel.setOpaque(true); // Ensure label is opaque
+        contentPane.add(titleLabel, BorderLayout.BEFORE_FIRST_LINE);
+
         // Create a panel to display doctor buttons
-        JPanel doctorPanel = new JPanel(new GridLayout(5, 1));
+        JPanel doctorPanel = new JPanel(new GridLayout(5, 1, 5, 5)); // Set vertical and horizontal gaps
         contentPane.add(doctorPanel, BorderLayout.WEST);
 
         // Create doctor buttons
@@ -38,15 +45,18 @@ public class AppointmentPage extends JFrame {
             doctorButtonPanel.add(doctorButton, BorderLayout.WEST);
 
             // Create time slot buttons
-            JPanel timeSlotPanel = new JPanel(new GridLayout(3, 1));
+            JPanel timeSlotPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5)); // Align time slots next to each other
             String[] timeSlots = {"5PM - 6PM", "6PM - 7PM", "7PM - 8PM"};
             for (String timeSlot : timeSlots) {
                 JButton timeSlotButton = new JButton(timeSlot);
-                timeSlotButton.setPreferredSize(new Dimension(150, 30)); // Set button size
+                timeSlotButton.setPreferredSize(new Dimension(100, 30)); // Set button size
                 timeSlotButton.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        // Implement action when a time slot button is clicked
-                        JOptionPane.showMessageDialog(null, "You selected: " + doctor + " at " + timeSlot);
+                        // Get the selected doctor and time slot
+                        selectedDoctor = doctor;
+                        String selectedTimeSlot = timeSlot;
+                        // Display confirmation message
+                        JOptionPane.showMessageDialog(null, "You selected: " + selectedDoctor + " at " + selectedTimeSlot);
                     }
                 });
                 timeSlotPanel.add(timeSlotButton);
@@ -59,8 +69,10 @@ public class AppointmentPage extends JFrame {
         selectedDoctorLabel = new JLabel("Selected Doctor: None");
         contentPane.add(selectedDoctorLabel, BorderLayout.SOUTH);
 
-        // Create a back button
+        // Create a panel for the back button
+        JPanel backButtonPanel = new JPanel(new BorderLayout());
         JButton backButton = new JButton("Back");
+        backButtonPanel.add(backButton, BorderLayout.EAST);
         backButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 dispose(); // Close the current window
@@ -69,7 +81,7 @@ public class AppointmentPage extends JFrame {
                 // new PreviousPage().setVisible(true);
             }
         });
-        contentPane.add(backButton, BorderLayout.NORTH);
+        contentPane.add(backButtonPanel, BorderLayout.SOUTH);
     }
 
     public static void main(String[] args) {
