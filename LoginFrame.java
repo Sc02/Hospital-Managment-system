@@ -13,7 +13,7 @@ public class LoginFrame extends JFrame {
     public LoginFrame() {
         setTitle("Login Page");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 450, 300);
+        setBounds(100, 100, 600, 500);
         contentPane = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -88,6 +88,12 @@ public class LoginFrame extends JFrame {
         JLabel footerLabel = new JLabel("Group 32");
         footerPanel.add(footerLabel);
         contentPane.add(footerPanel, BorderLayout.SOUTH);
+
+        // Inside the LoginFrame constructor or initialization method
+        pharmacyButton.addActionListener(e -> {
+        this.setVisible(false); // Hide LoginFrame
+        new PharmacyPage(this).setVisible(true); // Create and show PharmacyPage, passing the current LoginFrame instance
+        });
     }
 
     public static void main(String[] args) {
