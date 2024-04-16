@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class PharmacyPage extends JFrame {
+    
     private JPanel contentPane;
     private LoginFrame loginFrame; 
 
@@ -22,6 +23,51 @@ public class PharmacyPage extends JFrame {
         };
         contentPane.setLayout(new BorderLayout(0, 0));
         setContentPane(contentPane);
+        contentPane.setOpaque(false);
+        //beggining of med display
+        JPanel centerPanel = new JPanel();
+        centerPanel.setLayout(new GridLayout(5, 1)); // 5 rows for medicines
+        contentPane.add(centerPanel, BorderLayout.CENTER);
+        centerPanel.setOpaque(false);
+
+        // Create and add 5 medicine lines with increment counters
+        for (int i = 1; i <= 5; i++) {
+            JPanel medicinePanel = new JPanel();
+            medicinePanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+            medicinePanel.setOpaque(false);
+
+            JLabel medicineLabel = new JLabel("Medicine" + i);
+            JTextField countField = new JTextField("0", 5);
+            countField.setEditable(false);
+
+            JButton incrementButton = new JButton("+");
+            incrementButton.addActionListener(e -> {
+                int count = Integer.parseInt(countField.getText());
+                countField.setText(String.valueOf(++count));
+            });
+
+            JButton decrementButton = new JButton("-");
+            decrementButton.addActionListener(e -> {
+                int count = Integer.parseInt(countField.getText());
+                count = (count > 0) ? --count : 0;
+                countField.setText(String.valueOf(count));
+            });
+
+            medicinePanel.add(medicineLabel);
+            medicinePanel.add(decrementButton);
+            medicinePanel.add(countField);
+            medicinePanel.add(incrementButton);
+
+            centerPanel.add(medicinePanel);
+        }
+
+        JButton buyButton = new JButton("Buy");
+        buyButton.addActionListener(e -> {
+            // Implement what happens when the Buy button is clicked
+            JOptionPane.showMessageDialog(this, "Purchase made!");
+        });
+        contentPane.add(buyButton, BorderLayout.SOUTH);
+        //end of med display
 
         // Navigation bar panel
         JPanel navBarPanel = new JPanel(new BorderLayout());
@@ -71,6 +117,49 @@ public class PharmacyPage extends JFrame {
         };
         contentPane.setLayout(new BorderLayout(0, 0));
         setContentPane(contentPane);
+
+        //beggining of med display
+        JPanel centerPanel = new JPanel();
+        centerPanel.setLayout(new GridLayout(5, 1)); // 5 rows for medicines
+        contentPane.add(centerPanel, BorderLayout.CENTER);
+
+        // Create and add 5 medicine lines with increment counters
+        for (int i = 1; i <= 5; i++) {
+            JPanel medicinePanel = new JPanel();
+            medicinePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+
+            JLabel medicineLabel = new JLabel("Medicine" + i);
+            JTextField countField = new JTextField("0", 5);
+            countField.setEditable(false);
+
+            JButton incrementButton = new JButton("+");
+            incrementButton.addActionListener(e -> {
+                int count = Integer.parseInt(countField.getText());
+                countField.setText(String.valueOf(++count));
+            });
+
+            JButton decrementButton = new JButton("-");
+            decrementButton.addActionListener(e -> {
+                int count = Integer.parseInt(countField.getText());
+                count = (count > 0) ? --count : 0;
+                countField.setText(String.valueOf(count));
+            });
+
+            medicinePanel.add(medicineLabel);
+            medicinePanel.add(decrementButton);
+            medicinePanel.add(countField);
+            medicinePanel.add(incrementButton);
+
+            centerPanel.add(medicinePanel);
+        }
+
+        JButton buyButton = new JButton("Buy");
+        buyButton.addActionListener(e -> {
+            // Implement what happens when the Buy button is clicked
+            JOptionPane.showMessageDialog(this, "Purchase made!");
+        });
+        contentPane.add(buyButton, BorderLayout.SOUTH);
+        //end of med display
 
         // Navigation bar panel
         JPanel navBarPanel = new JPanel(new BorderLayout());
