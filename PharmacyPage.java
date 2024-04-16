@@ -96,22 +96,18 @@ public class PharmacyPage extends JFrame {
         backButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // Here, you can define what happens when the "Back" button is clicked.
-                // For example, you might want to close this window and show the previous one.
                 dispose(); // Close the current window
-                // new PreviousPage().setVisible(true); // Open the previous page, adjust as necessary
+                loginFrame.setVisible(true); // Show LoginFrame
             }
         });
-
-        // Back button
-        
-        backButton.addActionListener(e -> {
-            this.setVisible(false); // Hide PharmacyPage
-            loginFrame.setVisible(true); // Show LoginFrame
-        });
-        navBarPanel.add(backButton, BorderLayout.EAST);
+        navBarPanel.add(backButton, BorderLayout.WEST);
 
         // Adjustments to ensure the nav bar and heading look good
         navBarPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+    }
+
+    public PharmacyPage() {
+        //TODO Auto-generated constructor stub
     }
 
     private void updateTotalCost(double cost, boolean increment) {
