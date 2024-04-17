@@ -2,9 +2,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 
 public class AdminAppointments extends JFrame {
-    public AdminAppointments() {
+    private static String adminID;
+    public AdminAppointments(String adminID) {
+        AdminAppointments.adminID = adminID;
         setTitle("List of All Appointments");
         setSize(600, 400);
         setLocationRelativeTo(null); // Center the window
@@ -17,7 +20,12 @@ public class AdminAppointments extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 dispose(); // Close this window
-                new Admin().setVisible(true); // Open the Admin page
+                try {
+                    new Admin(adminID).setVisible(true);
+                } catch (SQLException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                } // Open the Admin page
             }
         });
         navBarPanel.add(backButton, BorderLayout.EAST);
@@ -37,7 +45,7 @@ public class AdminAppointments extends JFrame {
     public static void main(String[] args) {
         EventQueue.invokeLater(() -> {
             try {
-                AdminAppointments frame = new AdminAppointments();
+                AdminAppointments frame = new AdminAppointments(adminID);
                 frame.setVisible(true);
             } catch (Exception e) {
                 e.printStackTrace();
