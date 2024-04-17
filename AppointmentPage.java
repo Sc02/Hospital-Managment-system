@@ -14,6 +14,8 @@ public class AppointmentPage extends JFrame {
     private JLabel selectedDoctorLabel;
     private String selectedDoctor;
     private static String patientID;
+    private int[] lastSelectedSlot = {-1}; // Initialize as -1
+    private String[] lastSelectedDoctor = {"None"};
 
     public AppointmentPage(String patientID) throws SQLException {
         AppointmentPage.patientID = patientID;
@@ -59,12 +61,13 @@ public class AppointmentPage extends JFrame {
         contentPane.add(titleLabel, BorderLayout.BEFORE_FIRST_LINE);
 
         // Create a panel to display doctor buttons
-        JPanel doctorPanel = new JPanel(new GridLayout(5, 1, 5, 5)); // Set vertical and horizontal gaps
+        JPanel doctorPanel = new JPanel(new GridLayout(0, 1, 5, 5)); // Set vertical and horizontal gaps
         contentPane.add(doctorPanel, BorderLayout.WEST);
 
         // Create doctor buttons
         //list of doctors
         ArrayList<String> doctorNames = new ArrayList<>();
+        // int selectedSlot = -1;
         try (Statement stmt = connection.createStatement()) {
             String query = "SELECT docName FROM Doctor";
             ResultSet resultSet = stmt.executeQuery(query);
@@ -132,24 +135,12 @@ public class AppointmentPage extends JFrame {
                     public void actionPerformed(ActionEvent e) {
                         // Get the selected doctor and time slot
                         if (timeSlotFreeArray[index - 1]){
+                            lastSelectedSlot[0] = index;
+                            lastSelectedDoctor[0] = doctor;
                             selectedDoctor = doctor;
                             String selectedTimeSlot = timeSlot;
                             // Display confirmation message
                             JOptionPane.showMessageDialog(null, "You selected: " + selectedDoctor + " at " + selectedTimeSlot);
-                            //update the database
-                            try (Statement stmt = connection.createStatement()) {
-                                String empIdQuery = "SELECT employeeID FROM Doctor WHERE docName = '" + selectedDoctor + "'";
-                                ResultSet empIdResult = stmt.executeQuery(empIdQuery);
-                    
-                                String empId = ""; // Initialize empId
-                                if (empIdResult.next()) {
-                                    empId = empIdResult.getString("employeeID");
-                                }
-                                String query = "INSERT INTO Appointment (patientID, doctorID, slot) VALUES ('" + patientID + "', '" + empId + "', '" + index + "')";
-                                stmt.executeUpdate(query);
-                            } catch (SQLException e1) {
-                                e1.printStackTrace();
-                            }
                         }
                     }
                 });
@@ -158,6 +149,37 @@ public class AppointmentPage extends JFrame {
             doctorButtonPanel.add(timeSlotPanel, BorderLayout.CENTER);
             doctorPanel.add(doctorButtonPanel);
         }
+
+        
+        JButton bookAppointmentButton = new JButton("Book Appointment");
+        bookAppointmentButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                // Handle booking appointment action
+                if (lastSelectedSlot[0] == -1) {
+                    JOptionPane.showMessageDialog(null, "Please select an appointment before booking.");
+                } else {
+                    // Use the value of lastSelectedSlot here
+                    System.out.println("Last selected slot: " + lastSelectedSlot[0]);
+                    // Proceed with booking the appointment
+                    int index = lastSelectedSlot[0];
+                    selectedDoctor = lastSelectedDoctor[0];
+                    try (Statement stmt = connection.createStatement()) {
+                        String empIdQuery = "SELECT employeeID FROM Doctor WHERE docName = '" + selectedDoctor + "'";
+                        ResultSet empIdResult = stmt.executeQuery(empIdQuery);
+            
+                        String empId = ""; // Initialize empId
+                        if (empIdResult.next()) {
+                            empId = empIdResult.getString("employeeID");
+                        }
+                        String query = "INSERT INTO Appointment (patientID, doctorID, slot) VALUES ('" + patientID + "', '" + empId + "', '" + index + "')";
+                        stmt.executeUpdate(query);
+                    } catch (SQLException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+            }
+        });
+        contentPane.add(bookAppointmentButton, BorderLayout.CENTER);
 
         // Create a label to display selected doctor
         selectedDoctorLabel = new JLabel("Selected Doctor: None");
