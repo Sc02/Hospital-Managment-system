@@ -1,9 +1,11 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.sql.SQLException;
 
 public class DoctorsPage extends JFrame {
 
+    protected static final String patientID = null;
     private JPanel contentPane;
 
     public DoctorsPage() {
@@ -29,11 +31,9 @@ public class DoctorsPage extends JFrame {
         contentPane.add(signOutButton);
         signOutButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // Close the current DoctorPage window
-                dispose();
+                dispose(); // Close the current window
                 // Open the login page
-                LoginFrame loginFrame = new LoginFrame();
-                loginFrame.setVisible(true);
+                new LoginFrame().setVisible(true);
             }
         });
 
@@ -51,6 +51,17 @@ public class DoctorsPage extends JFrame {
         JButton availableWardsButton = new JButton("Available Wards");
         availableWardsButton.setBounds(50, 300, 150, 30);
         contentPane.add(availableWardsButton);
+        availableWardsButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                dispose(); // Close the current window
+                try {
+                    // Open the WardPage
+                    new WardPage(patientID).setVisible(true);
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
     }
 
     public static void main(String[] args) {
