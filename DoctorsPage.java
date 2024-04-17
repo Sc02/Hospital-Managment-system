@@ -1,73 +1,52 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.SQLException;
 
 public class DoctorsPage extends JFrame {
-
-    protected static final String patientID = null;
-    private JPanel contentPane;
-
-    public DoctorsPage() {
-        setTitle("Doctor Page");
+    private static String adminID;
+    public DoctorsPage(String adminID) {
+        DoctorsPage.adminID = adminID;
+        setTitle("Doctors");
+        setSize(400, 300);
+        setLocationRelativeTo(null); // Center the window
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 800, 400);
-        contentPane = new JPanel() {
+
+        // Navigation bar with Back button
+        JPanel navBarPanel = new JPanel(new BorderLayout());
+        JButton backButton = new JButton("Back");
+        backButton.addActionListener(new ActionListener() {
             @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                // Draw the background image
-                ImageIcon imageIcon = new ImageIcon("doctor_background.jpg");
-                Image image = imageIcon.getImage();
-                g.drawImage(image, 0, 0, getWidth(), getHeight(), this);
-            }
-        };
-        contentPane.setLayout(null); // Use absolute layout
-        setContentPane(contentPane);
-
-        // Create sign out button
-        JButton signOutButton = new JButton("Sign Out");
-        signOutButton.setBounds(650, 10, 120, 30);
-        contentPane.add(signOutButton);
-        signOutButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                dispose(); // Close the current window
-                // Open the login page
-                new LoginFrame().setVisible(true);
-            }
-        });
-
-        // Create time slot buttons
-        String[] timeSlots = {"5PM - 6PM", "6PM - 7PM", "7PM - 8PM"};
-        int yPos = 50; // Initial y-position for time slot buttons
-        for (String timeSlot : timeSlots) {
-            JButton timeSlotButton = new JButton(timeSlot);
-            timeSlotButton.setBounds(50, yPos, 150, 30);
-            contentPane.add(timeSlotButton);
-            yPos += 40; // Increment y-position for the next button
-        }
-
-        // Create "Available Wards" button
-        JButton availableWardsButton = new JButton("Available Wards");
-        availableWardsButton.setBounds(50, 300, 150, 30);
-        contentPane.add(availableWardsButton);
-        availableWardsButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                dispose(); // Close the current window
+                dispose(); // Close this window
                 try {
-                    // Open the WardPage
-                    new WardPage(patientID).setVisible(true);
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
+                    new Admin(adminID).setVisible(true);
+                } catch (SQLException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                } // Open the Admin page
             }
         });
+        navBarPanel.add(backButton, BorderLayout.EAST);
+        getContentPane().add(navBarPanel, BorderLayout.NORTH);
+
+        // Table with placeholder data for payments
+        String[] columnNames = {"DoctorID", "Doctor name","Salary"};
+        Object[][] data = {
+            {"d001", "Mukesh",1000000},
+            {"d002", "Gukesh",7500000}
+        };
+        JTable table = new JTable(data, columnNames);
+        JScrollPane scrollPane = new JScrollPane(table);
+        getContentPane().add(scrollPane, BorderLayout.CENTER);
+
     }
 
     public static void main(String[] args) {
         EventQueue.invokeLater(() -> {
             try {
-                DoctorsPage frame = new DoctorsPage();
+                DoctorsPage frame = new DoctorsPage(adminID);
                 frame.setVisible(true);
             } catch (Exception e) {
                 e.printStackTrace();

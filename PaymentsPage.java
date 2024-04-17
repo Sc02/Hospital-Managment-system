@@ -2,9 +2,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 
 public class PaymentsPage extends JFrame {
-    public PaymentsPage() {
+    private static String adminID;
+    public PaymentsPage(String adminID) {
+        PaymentsPage.adminID = adminID;
         setTitle("Payments");
         setSize(400, 300);
         setLocationRelativeTo(null); // Center the window
@@ -17,7 +20,12 @@ public class PaymentsPage extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 dispose(); // Close this window
-                new Admin().setVisible(true); // Open the Admin page
+                try {
+                    new Admin(adminID).setVisible(true);
+                } catch (SQLException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                } // Open the Admin page
             }
         });
         navBarPanel.add(backButton, BorderLayout.EAST);
@@ -53,7 +61,7 @@ public class PaymentsPage extends JFrame {
     public static void main(String[] args) {
         EventQueue.invokeLater(() -> {
             try {
-                PaymentsPage frame = new PaymentsPage();
+                PaymentsPage frame = new PaymentsPage(adminID);
                 frame.setVisible(true);
             } catch (Exception e) {
                 e.printStackTrace();

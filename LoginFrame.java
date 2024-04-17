@@ -43,7 +43,7 @@ public class LoginFrame extends JFrame {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                g.drawImage(new ImageIcon("HospitalManagement/src/login_background.jpg").getImage(), 0, 0, this.getWidth(), this.getHeight(), this);
+                g.drawImage(new ImageIcon(getClass().getResource("/login_background.jpg")).getImage(), 0, 0, this.getWidth(), this.getHeight(), this);
             }
         };
         contentPane.setLayout(new BorderLayout(0, 0));
@@ -108,46 +108,44 @@ public class LoginFrame extends JFrame {
 
         signInButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                final String enteredUsername = usernameField.getText(); // Assign the entered username to the class-level variable
+                final String enteredUsername = usernameField.getText();
                 final String enteredPassword = new String(passwordField.getPassword());
-                System.out.println("Username: " + enteredUsername);
-                System.out.println("Password: " + enteredPassword);
         
                 try (Statement stmt = connection.createStatement()) {
-                    String query = "select * from loginCredentials where userID = '" + enteredUsername + "'";
+                    String query = "SELECT * FROM loginCredentials WHERE userID = '" + enteredUsername + "' AND password = '" + enteredPassword + "'";
                     ResultSet resultSet = stmt.executeQuery(query);
-      
-                    boolean isFound = false;
-                    // int resultCount = 0; 
-                    while (resultSet.next()) {
-                        isFound = true;
-                        // resultCount++;
-                        System.out.println("Data Found = " + resultSet.getString("userID"));
-                        //check if userName and password match
-
-                        String matchPassword  = "select * from loginCredentials where userID = '" + enteredUsername + "' and password = '" + enteredPassword + "'";
-                        ResultSet matchResult = stmt.executeQuery(matchPassword);
-                        if(matchResult.next()) {
-                            System.out.println("Login Successful");
-                            if (enteredUsername.startsWith("e")) {
-                                // Redirect to the patient page if username starts with 'e'
-                                PatientPage patientPage = new PatientPage(enteredUsername);
-                                patientPage.setVisible(true);
-                            } else if (enteredUsername.startsWith("a")) {
-                                // Redirect to the admin page if username starts with 'a'
-                                Admin adminPage = new Admin(enteredUsername);
-                                adminPage.setVisible(true);
-                            }
+        
+                    if (resultSet.next()) {
+                        // Authentication successful
+                        System.out.println("Login Successful");
+        
+                        // Dispose of the login frame
+                        dispose();
+        
+                        // Depending on the user type, open the corresponding frame
+                        if (enteredUsername.startsWith("e")) {
+                            EventQueue.invokeLater(() -> {
+                                try {
+                                    PatientPage patientPage = new PatientPage(enteredUsername);
+                                    patientPage.setVisible(true);
+                                } catch (Exception e1) {
+                                    e1.printStackTrace();
+                                }
+                            });
+                        } else if (enteredUsername.startsWith("a")) {
+                            EventQueue.invokeLater(() -> {
+                                try {
+                                    Admin adminPage = new Admin(enteredUsername);
+                                    adminPage.setVisible(true);
+                                } catch (Exception e1) {
+                                    e1.printStackTrace();
+                                }
+                            });
                         }
-                        break;
+                    } else {
+                        // Authentication failed
+                        JOptionPane.showMessageDialog(null, "Invalid username or password.", "Login Failed", JOptionPane.ERROR_MESSAGE);
                     }
-      
-                    if (!isFound) {
-                        SwingUtilities.invokeLater(() -> {
-                            JOptionPane.showMessageDialog(null, "No Record Found. Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
-                        });
-                    }
-                    // System.out.println("Number of results: " + resultCount);
                 } catch (SQLException e1) {
                     e1.printStackTrace();
                 }
