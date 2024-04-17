@@ -112,7 +112,7 @@ public class AppointmentPage extends JFrame {
                     ResultSet resultSet = stmt.executeQuery(query);
       
                     boolean isFound = false;
-                    int resultCount = 0; 
+                    // int resultCount = 0; 
                     while (resultSet.next()) {
                         isFound = true;
                         System.out.println("Appointment Found ");
@@ -126,7 +126,7 @@ public class AppointmentPage extends JFrame {
                         timeSlotFreeArray[i] = true;
                         timeSlotButton.setBackground(Color.GREEN);
                     }
-                    System.out.println("Number of results: " + resultCount);
+                    // System.out.println("Number of results: " + resultCount);
                 } catch (SQLException e1) {
                     e1.printStackTrace();
                 }
@@ -138,9 +138,9 @@ public class AppointmentPage extends JFrame {
                             lastSelectedSlot[0] = index;
                             lastSelectedDoctor[0] = doctor;
                             selectedDoctor = doctor;
-                            String selectedTimeSlot = timeSlot;
+                            // String selectedTimeSlot = timeSlot;
                             // Display confirmation message
-                            JOptionPane.showMessageDialog(null, "You selected: " + selectedDoctor + " at " + selectedTimeSlot);
+                            // JOptionPane.showMessageDialog(null, "You selected: " + selectedDoctor + " at " + selectedTimeSlot);
                         }
                     }
                 });
@@ -173,13 +173,19 @@ public class AppointmentPage extends JFrame {
                         }
                         String query = "INSERT INTO Appointment (patientID, doctorID, slot) VALUES ('" + patientID + "', '" + empId + "', '" + index + "')";
                         stmt.executeUpdate(query);
+                        JOptionPane.showMessageDialog(null, "You have successfully booked an appointment!");
+                        PatientPage patientPage = new PatientPage(patientID);
+                        patientPage.setVisible(true);
                     } catch (SQLException e1) {
                         e1.printStackTrace();
                     }
                 }
             }
         });
-        contentPane.add(bookAppointmentButton, BorderLayout.CENTER);
+        // contentPane.add(bookAppointmentButton, BorderLayout.CENTER);
+        JPanel bookAppointmentPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        bookAppointmentPanel.add(bookAppointmentButton);
+        contentPane.add(bookAppointmentPanel, BorderLayout.CENTER);
 
         // Create a label to display selected doctor
         selectedDoctorLabel = new JLabel("Selected Doctor: None");
@@ -191,10 +197,13 @@ public class AppointmentPage extends JFrame {
         backButtonPanel.add(backButton, BorderLayout.EAST);
         backButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                dispose(); // Close the current window
-                // Open the previous page, adjust as necessary
-                // For example:
-                // new PreviousPage().setVisible(true);
+                PatientPage patientPage;
+                try {
+                    patientPage = new PatientPage(patientID);
+                    patientPage.setVisible(true);
+                } catch (SQLException e1) {
+                    e1.printStackTrace();
+                }
             }
         });
         contentPane.add(backButtonPanel, BorderLayout.SOUTH);

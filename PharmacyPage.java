@@ -12,7 +12,7 @@ public class PharmacyPage extends JFrame {
     private JPanel contentPane;
     private JLabel totalCostLabel;
     private double totalCost = 0.0;
-    public PharmacyPage(LoginFrame loginFrame,String userID) throws SQLException {
+    public PharmacyPage(String userID) throws SQLException {
         System.out.println("User id fro pharma is " + userID);
         setTitle("Pharmacy");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -180,8 +180,13 @@ public class PharmacyPage extends JFrame {
         // Back button
         
         backButton.addActionListener(e -> {
-            this.setVisible(false); // Hide PharmacyPage
-            loginFrame.setVisible(true); // Show LoginFrame
+            try {
+                PatientPage patientPage = new PatientPage(userID);
+                patientPage.setVisible(true);
+            } catch (SQLException e1) {
+                e1.printStackTrace();
+            }
+            
         });
         navBarPanel.add(backButton, BorderLayout.EAST);
 
@@ -199,10 +204,9 @@ public class PharmacyPage extends JFrame {
     }
 
     public static void main(String[] args) throws SQLException {
-        LoginFrame loginFrame = new LoginFrame();
         EventQueue.invokeLater(() -> {
             try {
-                PharmacyPage frame = new PharmacyPage(loginFrame, "userID"); // Assuming userID is fetched and passed here correctly
+                PharmacyPage frame = new PharmacyPage("userID"); // Assuming userID is fetched and passed here correctly
                 frame.setVisible(true);
             } catch (Exception e) {
                 e.printStackTrace();
