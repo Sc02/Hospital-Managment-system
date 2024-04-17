@@ -1,56 +1,103 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class PharmacyPage extends JFrame {
     
     private JPanel contentPane;
-    private LoginFrame loginFrame; 
     private JLabel totalCostLabel;
     private double totalCost = 0.0;
-
-    // Assuming these are the costs for the medicines
-    private double[] medicineCosts = {10.0, 20.0, 15.0, 25.0, 30.0};
-
-
-    public PharmacyPage(LoginFrame loginFrame) {
-        this.loginFrame = loginFrame;
-
+    public PharmacyPage(LoginFrame loginFrame,String userID) throws SQLException {
+        System.out.println("User id fro pharma is " + userID);
         setTitle("Pharmacy");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 900, 600);
+        setBounds(100, 100, 600, 450);
         contentPane = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 // Adjust the path to your background image as necessary
-                g.drawImage(new ImageIcon("pharmacy_background.jpg").getImage(), 0, 0, this.getWidth(), this.getHeight(), this);
+                g.drawImage(new ImageIcon("HospitalManagement/src/pharmacy_background.jpg").getImage(), 0, 0, this.getWidth(), this.getHeight(), this);
             }
         };
         contentPane.setLayout(new BorderLayout(0, 0));
         setContentPane(contentPane);
         contentPane.setOpaque(false);
+
+
+
+        //setting up connection
+
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        String urlDB = "jdbc:mysql://localhost:3306/HospitalManagementSystem";
+        String username = "root";
+        String password = "root@123";
+        Connection connection = DriverManager.getConnection(urlDB, username, password);
+
+        if (connection != null) {
+            System.out.println("Connection established");
+        }
+
+        int resultCount = 0;
+        String[] medNameList = new String[20]; 
+        double[] priceList = new double[20];
+        int[] limitList = new int[20];
+        try (Statement stmt = connection.createStatement()) {
+            String medQuery = "select * from Pharmacy";
+            ResultSet medResult = stmt.executeQuery(medQuery);
+
+            boolean isFound = false;
+            while (medResult.next()) {
+                isFound = true;
+                medNameList[resultCount] = medResult.getString("medName");
+                priceList[resultCount] = Double.parseDouble(medResult.getString("price"));
+                limitList[resultCount] = Integer.parseInt(medResult.getString("maxNo"));
+                resultCount++;
+            }
+
+            if (!isFound) {
+                SwingUtilities.invokeLater(() -> {
+                    JOptionPane.showMessageDialog(null, "No Record Found. Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
+                });
+            }
+            System.out.println("Number of results: " + resultCount);
+        } catch (SQLException e1) {
+            e1.printStackTrace();
+        }
+
         //beggining of med display
         JPanel centerPanel = new JPanel();
-        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS)); // 5 rows for medicines
+        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS)); // Changed to BoxLayout for vertical arrangement
         contentPane.add(centerPanel, BorderLayout.CENTER);
         centerPanel.setOpaque(false);
 
         // Create and add 5 medicine lines with increment counters
-        for (int i = 1; i <= 5; i++) {
+        final int finalResultCount = resultCount;
+        for (int i = 0; i < finalResultCount; i++) {
+            int finalI = i; // Declare finalI inside the loop
             JPanel medicinePanel = new JPanel();
             medicinePanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
             medicinePanel.setOpaque(false);
-            int j = i-1;
-            JLabel medicineLabel = new JLabel("Medicine" + i + " (Rs. " + medicineCosts[i-1] + ")");
+            JLabel medicineLabel = new JLabel(medNameList[i] + " (Rs. " + priceList[i] + ")");
             JTextField countField = new JTextField("0", 5);
             countField.setEditable(false);
 
+            
             JButton incrementButton = new JButton("+");
             incrementButton.addActionListener(e -> {
-                int count = Integer.parseInt(countField.getText());
-                countField.setText(String.valueOf(++count));
-                updateTotalCost(medicineCosts[j], true);
+                int countIncremented = Integer.parseInt(countField.getText()) + 1;
+                countField.setText(String.valueOf(countIncremented));
+                updateTotalCost(priceList[finalI], true);
             });
 
             JButton decrementButton = new JButton("-");
@@ -58,14 +105,14 @@ public class PharmacyPage extends JFrame {
                 int count = Integer.parseInt(countField.getText());
                 if (count > 0) {
                     countField.setText(String.valueOf(--count));
-                    updateTotalCost(medicineCosts[j], false);
+                    updateTotalCost(priceList[finalI], false);
                 }
             });
 
             medicinePanel.add(medicineLabel);
-            medicinePanel.add(decrementButton);
-            medicinePanel.add(countField);
             medicinePanel.add(incrementButton);
+            medicinePanel.add(countField);
+            medicinePanel.add(decrementButton);
 
             centerPanel.add(medicinePanel);
         }
@@ -75,11 +122,39 @@ public class PharmacyPage extends JFrame {
 
         JButton buyButton = new JButton("Buy");
         buyButton.addActionListener(e -> {
-            // Implement what happens when the Buy button is clicked
             JOptionPane.showMessageDialog(this, "Purchase made!");
+            for (int i = 0; i < finalResultCount; i++) {
+                JPanel medicinePanel = (JPanel) centerPanel.getComponent(i);
+                JTextField countField = (JTextField) medicinePanel.getComponent(2); // Assuming countField is the third component in each medicinePanel
+                countField.setText("0");
+            }
         });
         contentPane.add(buyButton, BorderLayout.SOUTH);
         //end of med display
+
+        buyButton.addActionListener(e -> {
+            try (Statement stmt = connection.createStatement()) {
+                for (int i = 0; i < finalResultCount; i++) {
+                    int finalI = i; // Declare finalI inside the loop for lambda expression
+                    JPanel medicinePanel = (JPanel) centerPanel.getComponent(i);
+                    JTextField countField = (JTextField) medicinePanel.getComponent(2); // Assuming countField is the third component in each medicinePanel
+                    int quantity = Integer.parseInt(countField.getText());
+                    if (quantity > 0) {
+                        String updateQuery = "UPDATE Pharmacy SET maxNo = maxNo - " + quantity + " WHERE medName = '" + medNameList[finalI] + "'";
+                        stmt.executeUpdate(updateQuery);
+                    }
+                }
+                JOptionPane.showMessageDialog(this, "Purchase made!");
+                // Reset all count fields to 0
+                for (int i = 0; i < finalResultCount; i++) {
+                    JPanel medicinePanel = (JPanel) centerPanel.getComponent(i);
+                    JTextField countField = (JTextField) medicinePanel.getComponent(2); // Assuming countField is the third component in each medicinePanel
+                    countField.setText("0");
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        });
 
         // Navigation bar panel
         JPanel navBarPanel = new JPanel(new BorderLayout());
@@ -96,34 +171,38 @@ public class PharmacyPage extends JFrame {
         backButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // Here, you can define what happens when the "Back" button is clicked.
+                // For example, you might want to close this window and show the previous one.
                 dispose(); // Close the current window
-                loginFrame.setVisible(true); // Show LoginFrame
+                // new PreviousPage().setVisible(true); // Open the previous page, adjust as necessary
             }
         });
-        navBarPanel.add(backButton, BorderLayout.WEST);
+
+        // Back button
+        
+        backButton.addActionListener(e -> {
+            this.setVisible(false); // Hide PharmacyPage
+            loginFrame.setVisible(true); // Show LoginFrame
+        });
+        navBarPanel.add(backButton, BorderLayout.EAST);
 
         // Adjustments to ensure the nav bar and heading look good
         navBarPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
     }
 
-    public PharmacyPage() {
-        //TODO Auto-generated constructor stub
-    }
-
-    private void updateTotalCost(double cost, boolean increment) {
+    private void updateTotalCost(double priceList, boolean increment) {
         if (increment) {
-            totalCost += cost;
+            totalCost += priceList;
         } else {
-            totalCost -= cost;
+            totalCost -= priceList;
         }
         totalCostLabel.setText("Total Cost: Rs." + String.format("%.2f", totalCost));
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
         LoginFrame loginFrame = new LoginFrame();
         EventQueue.invokeLater(() -> {
             try {
-                PharmacyPage frame = new PharmacyPage(loginFrame);
+                PharmacyPage frame = new PharmacyPage(loginFrame, "userID"); // Assuming userID is fetched and passed here correctly
                 frame.setVisible(true);
             } catch (Exception e) {
                 e.printStackTrace();
