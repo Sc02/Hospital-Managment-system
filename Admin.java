@@ -2,15 +2,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class Admin extends JFrame {
     private JPanel contentPane;
+    private static String adminID;
 
-    public Admin() {
+    public Admin(String adminID) {
+        Admin.adminID = adminID;
         setTitle("Admin");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setMinimumSize(new Dimension(900, 600)); // Adjusted for additional fields
@@ -56,40 +54,20 @@ public class Admin extends JFrame {
         contentPane.add(scrollPane, BorderLayout.CENTER);
 
         // Adding components to the main content panel
-        addComponentWithLabel(mainContentPanel, "Add Doctor:", 2); // 4 additional fields for "Add Doctor"
-        addComponentWithLabel(mainContentPanel, "Delete Doctor:", 0);
+        addComponentWithLabel(mainContentPanel, "Add Doctor:", 3); // 4 additional fields for "Add Doctor"
         addComponentWithLabel(mainContentPanel, "Add Medicine:", 2); // 3 additional fields for "Add Medicine"
-        addComponentWithLabel(mainContentPanel, "Delete Medicine:", 0);
 
          // Add the four buttons to the main content panel
     addButton(mainContentPanel, "Appointments");
     addButton(mainContentPanel, "Payments");
     addButton(mainContentPanel, "Wards");
-    addButton(mainContentPanel, "Doctors");
+    addButton(mainContentPanel, "Salaries");
 
     pack(); // Adjusts window size to fit components
 }
 
 private void addButton(JPanel panel, String buttonText) {
     JButton button = new JButton(buttonText);
-    button.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if ("Appointments".equals(buttonText)) {
-                Admin.this.dispose(); // Close the Admin window
-                new AdminAppointments().setVisible(true); // Open the AdminAppointments page
-            } else if ("Payments".equals(buttonText)) {
-                Admin.this.dispose(); // Close the Admin window
-                new PaymentsPage().setVisible(true); // Open the PaymentsPage
-            } else if ("Doctors".equals(buttonText)) {
-                Admin.this.dispose(); // Close the Admin window
-                new DoctorsPage().setVisible(true); // Open the DoctorsPage
-            } else if ("Wards".equals(buttonText)) {
-                Admin.this.dispose(); // Close the Admin window
-                new WardPage().setVisible(true); // Open the DoctorsPage
-            }
-        }
-    });
     JPanel flowPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
     flowPanel.setOpaque(false); // Make flowPanel transparent
     flowPanel.add(button);
@@ -138,7 +116,7 @@ private void addButton(JPanel panel, String buttonText) {
     public static void main(String[] args) {
         EventQueue.invokeLater(() -> {
             try {
-                Admin frame = new Admin();
+                Admin frame = new Admin(adminID);
                 frame.setVisible(true);
             } catch (Exception e) {
                 e.printStackTrace();
