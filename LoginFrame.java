@@ -141,6 +141,9 @@ public class LoginFrame extends JFrame {
                                     e1.printStackTrace();
                                 }
                             });
+                        } else if (enteredUsername.startsWith("d")) {
+                            DoctorsFrame docPage = new DoctorsFrame(enteredUsername);
+                            docPage.setVisible(true);
                         }
                     } else {
                         // Authentication failed
@@ -189,8 +192,10 @@ public class LoginFrame extends JFrame {
                                 } else if (enteredUsername.startsWith("a")) {
                                     Admin adminPage = new Admin(finalEnteredUsername);
                                     adminPage.setVisible(true);
+                                } else if (enteredUsername.startsWith("d")) {
+                                    DoctorsFrame docPage = new DoctorsFrame(finalEnteredUsername);
+                                    docPage.setVisible(true);
                                 }
-
                             } catch (Exception e1) {
                                 e1.printStackTrace();
                             }
