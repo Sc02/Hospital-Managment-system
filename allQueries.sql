@@ -258,6 +258,12 @@ insert into patientrecord values(2, "p002", "d002", curdate(),1 , 11, 2);
 insert into paymentrecord values(1, 23489.99);
 insert into paymentrecord values(2, 26999.47);
 
+insert into Pharmacy values(1 , "Paracetamol", 10, 2000);
+insert into Pharmacy values(2 , "Rantac", 100, 2000);
+insert into Pharmacy values(3 , "Dettol", 20, 2000);
+insert into Pharmacy values(5 , "Citrazine", 5, 2000);
+insert into Pharmacy values(7, "Azithromycin", 35, 2000);
+
 
 
 
