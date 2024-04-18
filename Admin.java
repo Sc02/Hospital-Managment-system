@@ -15,7 +15,7 @@ import java.sql.Statement;
 
 public class Admin extends JFrame {
     private JPanel contentPane;
-    private static String adminID;
+    static String adminID;
 
     public Admin(String adminID) throws SQLException {
         Admin.adminID = adminID;
@@ -87,10 +87,8 @@ public class Admin extends JFrame {
         contentPane.add(scrollPane, BorderLayout.CENTER);
 
         // Adding components to the main content panel
-        addComponentWithLabel(mainContentPanel, "Add Doctor:", 3); 
+        addComponentWithLabel(mainContentPanel, "Add Doctor:", 6); 
         addComponentWithLabel(mainContentPanel, "Delete Doctor:", 0);
-        addComponentWithLabel(mainContentPanel, "Add Medicine:", 3); 
-        addComponentWithLabel(mainContentPanel, "Delete Medicine:", 0);
 
          // Add the four buttons to the main content panel
     addButton(mainContentPanel, "Appointments");
@@ -117,7 +115,12 @@ private void addButton(JPanel panel, String buttonText) {
                 new DoctorsPage(adminID).setVisible(true); // Open the DoctorsPage
             } else if ("Wards".equals(buttonText)) {
                 Admin.this.dispose(); // Close the Admin window
-                new WardPage(adminID).setVisible(true); // Open the DoctorsPage
+                try {
+                    new WardPage(adminID).setVisible(true);
+                } catch (SQLException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                } // Open the DoctorsPage
             }
         }
     });
@@ -143,7 +146,7 @@ private void addButton(JPanel panel, String buttonText) {
         }
         panel.add(flowPanel);
 
-        JButton deleteButton = new JButton("Delete"); // Renamed the second button
+        JButton deleteButton = new JButton("Modify"); // Renamed the second button
         deleteButton.addActionListener(new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -156,7 +159,7 @@ private void addButton(JPanel panel, String buttonText) {
         
     flowPanel.add(deleteButton);
     if ("Add Doctor:".equals(labelText)) {
-        JLabel instructionLabel = new JLabel("<html><div style='color: red; font-size: 10px;'>(Enter the fields as: specialization, employeeID, docName, salary)</div></html>");
+        JLabel instructionLabel = new JLabel("<html><div style='color: red; font-size: 10px;'>(Enter the fields as: ID, Name, Salary, Specialization, Age, Email, Designation)</div></html>");
         flowPanel.add(instructionLabel);
     }
     if ("Delete Doctor:".equals(labelText)) {
@@ -219,26 +222,30 @@ private void addButton(JPanel panel, String buttonText) {
         }
     }
 
-    private void deleteMedicine(String medicineId) {
+    private void addDoctor(String specialization, String employeeID, String docName, double salary) {
         String urlDB = "jdbc:mysql://localhost:3306/HospitalManagementSystem";
         String username = "root";
         String password = "root@123";
-        String query = "DELETE FROM medicines WHERE medID = ?"; // Adjust table and column names as necessary
+        String query = "INSERT INTO doctor (specialization, employeeID, docName, salary) VALUES (?, ?, ?, ?)";
     
         try (Connection connection = DriverManager.getConnection(urlDB, username, password);
              PreparedStatement statement = connection.prepareStatement(query)) {
             
-            statement.setString(1, medicineId); // Set the medicine ID in the query
-            int rowsDeleted = statement.executeUpdate();
+            statement.setString(1, specialization);
+            statement.setString(2, employeeID);
+            statement.setString(3, docName);
+            statement.setDouble(4, salary);
+    
+            int rowsInserted = statement.executeUpdate();
             
-            if (rowsDeleted > 0) {
-                JOptionPane.showMessageDialog(null, "The medicine was deleted successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            if (rowsInserted > 0) {
+                System.out.println("A new doctor was added successfully!");
             } else {
-                JOptionPane.showMessageDialog(null, "No medicine found with the provided ID.", "Error", JOptionPane.ERROR_MESSAGE);
+                System.out.println("Failed to add a new doctor.");
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Deletion failed: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            System.out.println("Addition failed.");
         }
     }
 
