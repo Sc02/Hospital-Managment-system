@@ -1,8 +1,10 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +44,18 @@ public class PaymentsPage extends JFrame {
         JPanel navBar = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton backButton = new JButton("Back");
         navBar.add(backButton);
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose(); // Close the PaymentsPage window
+                try {
+                    new Admin(adminID).setVisible(true);
+                } catch (SQLException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                } // Open the Admin page
+            }
+        });
         add(navBar, BorderLayout.NORTH);
     }
 
