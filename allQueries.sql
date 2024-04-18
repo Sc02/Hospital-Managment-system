@@ -1,27 +1,172 @@
-use hospitalmanagementsystem;
+-- Write this query first in order to create the database
+-- create database HospitalManagementSystem
+
+use HospitalManagementSystem;
 
 show tables;
 
-truncate table doctor; 
-truncate table medicine;
-truncate table employee;
-truncate table ward;
-truncate table feedback;
-truncate table pharmacy;
-truncate table appointment;
-truncate table logincredentials;
-truncate table patient;
-truncate table patientrecord;
-truncate table resident;
-truncate table paymentrecord;
+-- Feedback
+drop table if exists feedback;
 
-alter table loginCredentials modify column userID varchar(255);
-alter table employee modify column employeeID varchar(255);
-alter table resident modify column residentID varchar(255);
-alter table resident modify column doctorID varchar(255);
-alter table patient modify column patientID varchar(255);
-alter table patientrecord modify column patientID varchar(255);
-alter table patientrecord modify column employeeID varchar(255);
+create table feedback(
+	feedbackNo int auto_increment,
+	patientID varchar(255),
+    employeeID varchar(255),
+    review varchar(255),
+    primary key (feedbackNo)
+);
+
+-- Employee
+drop table if exists employee;
+
+create table employee(
+		name varchar(255),
+        age int,
+        employeeID varchar(255),
+        salary float,
+        designation varchar (255),
+        email varchar (255),
+        primary key (employeeID)
+);
+
+-- Login
+drop table if exists loginCredentials;
+
+create table loginCredentials(
+		userID varchar(255),
+        password varchar(255),
+        primary key (userID)
+);
+
+-- Appointment
+drop table if exists Appointment;
+
+create table Appointment(
+		appID int auto_increment,
+        doctorID varchar(255),
+        patientID varchar(255),
+        appDate timestamp,
+        wardID int,
+        slot int,
+        primary key (appID)
+);
+
+-- Pharmacy 
+drop table if exists Pharmacy ;
+
+create table Pharmacy (
+		medID int auto_increment,
+        medName varchar (255),
+        price float,
+        maxNo int,
+        primary key (medID)
+);
+
+-- Medicine
+drop table if exists Medicine ;
+
+create table Medicine (
+		medID int auto_increment,
+        medName varchar(255),
+        category varchar(255),
+        dosage int,
+        primary key (medID)
+);
+
+-- PaymentRecord
+drop table if exists PaymentRecord ;
+
+create table PaymentRecord (
+		paymentID int,
+        amount float,
+        primary key (paymentID)
+);
+
+-- PatientRecord
+drop table if exists PatientRecord ;
+
+create table PatientRecord (
+		recordID int,
+        patientID varchar(255),
+        employeeID varchar(255),
+        appDate timestamp,
+        medID int,
+        wardID int,
+        paymentID int,
+        primary key (recordID)
+);
+
+-- Ward
+drop table if exists Ward ;
+
+create table Ward (
+		wardName varchar(255),
+        wardID int,
+        occupied bool,
+        patientID varchar(255),
+        primary key (wardID)
+);
+
+-- Patient
+
+drop table if exists Patient ;
+
+create table Patient (
+		patientName varchar(255),
+        age int,
+        patientID varchar(255),
+        address varchar(255),
+        visitCount int,
+        gender varchar(255),
+        primary key (patientID)
+);
+
+-- Doctor 
+
+drop table if exists Doctor ;
+
+create table Doctor (
+		specialisation varchar(255),
+        employeeID varchar(255),
+        docName varchar(255),
+        salary float,
+        primary key (employeeID)
+);
+
+-- Resident
+
+drop table if exists Resident ;
+
+create table Resident (
+		name varchar(255),
+        residentID varchar(255),
+        salary float,
+        primary key (residentID)
+);
+
+show tables;
+
+-- truncate table doctor; 
+-- truncate table medicine;
+-- truncate table employee;
+-- truncate table ward;
+-- truncate table feedback;
+-- truncate table pharmacy;
+-- truncate table appointment;
+-- truncate table logincredentials;
+-- truncate table patient;
+-- truncate table patientrecord;
+-- truncate table resident;
+-- truncate table paymentrecord;
+
+-- alter table loginCredentials modify column userID varchar(255);
+-- alter table employee modify column employeeID varchar(255);
+-- alter table resident modify column residentID varchar(255);
+-- alter table resident modify column doctorID varchar(255);
+-- alter table patient modify column patientID varchar(255);
+-- alter table patientrecord modify column patientID varchar(255);
+-- alter table patientrecord modify column employeeID varchar(255);
+-- alter table resident drop doctorID;
 
 insert into loginCredentials values("d001", "123");
 insert into loginCredentials values("d002", "123");
@@ -70,42 +215,42 @@ insert into medicine values(8, "Savlon", "Antiseptic", 1);
 insert into medicine values(9, "Insubinsu", "Painkiller", 2);
 insert into medicine values(10, "Cephalexin", "Antibiotic", 4);
 
-insert into resident values("Vance Lance", "r001", "d001", 10000);
-insert into resident values("Maria Greg", "r002", "d002", 10000);
-insert into resident values("Frank Finley", "r003", "d003", 10000);
-insert into resident values("Jolly Joseph", "r004", "d004", 10000);
-insert into resident values("Timmy W", "r005", "d005", 10000);
+insert into resident values("Vance Lance", "r001", 10000);
+insert into resident values("Maria Greg", "r002", 10000);
+insert into resident values("Frank Finley", "r003", 10000);
+insert into resident values("Jolly Joseph", "r004", 10000);
+insert into resident values("Timmy W", "r005", 10000);
 
-insert into ward values("Psychology", 1, false);
-insert into ward values("Psychology", 2, false);
-insert into ward values("Psychology", 3, false);
-insert into ward values("Psychology", 4, false);
-insert into ward values("Psychology", 5, false);
-insert into ward values("Psychology", 6, false);
-insert into ward values("Neurology", 7, false);
-insert into ward values("Neurology", 8, false);
-insert into ward values("Neurology", 9, false);
-insert into ward values("Neurology", 10, false);
-insert into ward values("Neurology", 11, false);
-insert into ward values("Neurology", 12, false);
-insert into ward values("Pediatrics", 13, false);
-insert into ward values("Pediatrics", 14, false);
-insert into ward values("Pediatrics", 15, false);
-insert into ward values("Pediatrics", 16, false);
-insert into ward values("Pediatrics", 17, false);
-insert into ward values("Pediatrics", 18, false);
-insert into ward values("Oncology", 19, false);
-insert into ward values("Oncology", 20, false);
-insert into ward values("Oncology", 21, false);
-insert into ward values("Oncology", 22, false);
-insert into ward values("Oncology", 23, false);
-insert into ward values("Oncology", 24, false);
-insert into ward values("Cardiology", 25, false);
-insert into ward values("Cardiology", 26, false);
-insert into ward values("Cardiology", 27, false);
-insert into ward values("Cardiology", 28, false);
-insert into ward values("Cardiology", 29, false);
-insert into ward values("Cardiology", 30, false);
+insert into ward values("Psychology", 1, false, null);
+insert into ward values("Psychology", 2, false, null);
+insert into ward values("Psychology", 3, false, null);
+insert into ward values("Psychology", 4, false, null);
+insert into ward values("Psychology", 5, false, null);
+insert into ward values("Psychology", 6, false, null);
+insert into ward values("Neurology", 7, false, null);
+insert into ward values("Neurology", 8, false, null);
+insert into ward values("Neurology", 9, false, null);
+insert into ward values("Neurology", 10, false, null);
+insert into ward values("Neurology", 11, false, null);
+insert into ward values("Neurology", 12, false, null);
+insert into ward values("Pediatrics", 13, false, null);
+insert into ward values("Pediatrics", 14, false, null);
+insert into ward values("Pediatrics", 15, false, null);
+insert into ward values("Pediatrics", 16, false, null);
+insert into ward values("Pediatrics", 17, false, null);
+insert into ward values("Pediatrics", 18, false, null);
+insert into ward values("Oncology", 19, false, null);
+insert into ward values("Oncology", 20, false, null);
+insert into ward values("Oncology", 21, false, null);
+insert into ward values("Oncology", 22, false, null);
+insert into ward values("Oncology", 23, false, null);
+insert into ward values("Oncology", 24, false, null);
+insert into ward values("Cardiology", 25, false, null);
+insert into ward values("Cardiology", 26, false, null);
+insert into ward values("Cardiology", 27, false, null);
+insert into ward values("Cardiology", 28, false, null);
+insert into ward values("Cardiology", 29, false, null);
+insert into ward values("Cardiology", 30, false, null);
 
 insert into patientrecord values(1, "p001", "d001", curdate(),2 , 1, 1);
 insert into patientrecord values(2, "p002", "d002", curdate(),1 , 11, 2);
