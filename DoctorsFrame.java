@@ -12,23 +12,13 @@ public class DoctorsFrame extends JFrame {
         setTitle("Doctor Page");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 800, 400);
-        contentPane = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                // Draw the background image
-                ImageIcon imageIcon = new ImageIcon("doctor_background.jpg");
-                Image image = imageIcon.getImage();
-                g.drawImage(image, 0, 0, getWidth(), getHeight(), this);
-            }
-        };
-        contentPane.setLayout(null); // Use absolute layout
+        contentPane = new JPanel();
+        contentPane.setLayout(new BorderLayout()); // Use BorderLayout
         setContentPane(contentPane);
 
         // Create sign out button
         JButton signOutButton = new JButton("Sign Out");
-        signOutButton.setBounds(650, 10, 120, 30);
-        contentPane.add(signOutButton);
+        contentPane.add(signOutButton, BorderLayout.NORTH);
         signOutButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 dispose(); // Close the current window
@@ -37,20 +27,11 @@ public class DoctorsFrame extends JFrame {
             }
         });
 
-        // Create time slot buttons
-        String[] timeSlots = {"5PM - 6PM", "6PM - 7PM", "7PM - 8PM"};
-        int yPos = 50; // Initial y-position for time slot buttons
-        for (String timeSlot : timeSlots) {
-            JButton timeSlotButton = new JButton(timeSlot);
-            timeSlotButton.setBounds(50, yPos, 150, 30);
-            contentPane.add(timeSlotButton);
-            yPos += 40; // Increment y-position for the next button
-        }
-
         // Create "Available Wards" button
         JButton availableWardsButton = new JButton("Available Wards");
-        availableWardsButton.setBounds(50, 300, 150, 30);
-        contentPane.add(availableWardsButton);
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER)); // Panel for centering
+        buttonPanel.add(availableWardsButton);
+        contentPane.add(buttonPanel, BorderLayout.CENTER); // Add to center
         availableWardsButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 dispose(); // Close the current window
