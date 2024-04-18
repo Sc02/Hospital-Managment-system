@@ -1,56 +1,82 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.SQLException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DoctorsPage extends JFrame {
-    private static String adminID;
+    private String adminID;
+
     public DoctorsPage(String adminID) {
-        DoctorsPage.adminID = adminID;
-        setTitle("Doctors");
-        setSize(400, 300);
-        setLocationRelativeTo(null); // Center the window
+        this.adminID = adminID;
+        setTitle("Doctors Page");
+        setSize(400, 400);
+        setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // Navigation bar with Back button
-        JPanel navBarPanel = new JPanel(new BorderLayout());
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new GridLayout(0, 3, 10, 10));
+
+        List<String> employeeIDs = new ArrayList<>();
+        List<String> docNames = new ArrayList<>();
+        List<Double> salaries = new ArrayList<>();
+
+        fetchDoctorDataFromDatabase(employeeIDs, docNames, salaries);
+
+        for (int i = 0; i < employeeIDs.size(); i++) {
+            JLabel employeeIDLabel = new JLabel("Employee ID: " + employeeIDs.get(i));
+            JLabel docNameLabel = new JLabel("Doctor Name: " + docNames.get(i));
+            JLabel salaryLabel = new JLabel("Salary: " + salaries.get(i));
+            mainPanel.add(employeeIDLabel);
+            mainPanel.add(docNameLabel);
+            mainPanel.add(salaryLabel);
+        }
+
+        add(mainPanel, BorderLayout.CENTER);
+
+        // Navigation Bar
+        JPanel navBar = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton backButton = new JButton("Back");
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                dispose(); // Close this window
-                try {
-                    new Admin(adminID).setVisible(true);
-                } catch (SQLException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                } // Open the Admin page
+                dispose(); // Close the current DoctorsPage
+                new Admin(adminID).setVisible(true); // Open the Admin page
             }
         });
-        navBarPanel.add(backButton, BorderLayout.EAST);
-        getContentPane().add(navBarPanel, BorderLayout.NORTH);
 
-        // Table with placeholder data for payments
-        String[] columnNames = {"DoctorID", "Doctor name","Salary"};
-        Object[][] data = {
-            {"d001", "Mukesh",1000000},
-            {"d002", "Gukesh",7500000}
-        };
-        JTable table = new JTable(data, columnNames);
-        JScrollPane scrollPane = new JScrollPane(table);
-        getContentPane().add(scrollPane, BorderLayout.CENTER);
+        navBar.add(backButton);
+        add(navBar, BorderLayout.NORTH);
+    }
 
+    private void fetchDoctorDataFromDatabase(List<String> employeeIDs, List<String> docNames, List<Double> salaries) {
+        try {
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/HospitalManagementSystem",
+                    "root", "root@123");
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT EmployeeID, docName, salary FROM Doctor");
+
+            while (resultSet.next()) {
+                employeeIDs.add(resultSet.getString("EmployeeID"));
+                docNames.add(resultSet.getString("docName"));
+                salaries.add(resultSet.getDouble("salary"));
+            }
+
+            resultSet.close();
+            statement.close();
+            connection.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static void main(String[] args) {
         EventQueue.invokeLater(() -> {
-            try {
-                DoctorsPage frame = new DoctorsPage(adminID);
-                frame.setVisible(true);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            new DoctorsPage("admin123").setVisible(true);
         });
     }
 }
