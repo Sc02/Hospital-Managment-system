@@ -8,5 +8,5 @@ Files included in zip:
 Instructions to run application:
 1.	Download and run allQueries.sql to create and populate the database.
 2.	Download the code folder and modify the values for host, user, password and database to reflect your system specifications.
-3.	Run loginFrame.java and use the application by clicking buttons on each page.
+3.	Run loginFrame.java and use the application by clicking the buttons on each page.
 
