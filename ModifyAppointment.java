@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-public class AppointmentPage extends JFrame {
+public class ModifyAppointment extends JFrame {
 
     private JPanel contentPane;
     private JLabel selectedDoctorLabel;
@@ -17,8 +17,8 @@ public class AppointmentPage extends JFrame {
     private int[] lastSelectedSlot = {-1}; // Initialize as -1
     private String[] lastSelectedDoctor = {"None"};
 
-    public AppointmentPage(String patientID) throws SQLException {
-        AppointmentPage.patientID = patientID;
+    public ModifyAppointment(String patientID) throws SQLException {
+        ModifyAppointment.patientID = patientID;
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException e) {
@@ -32,6 +32,7 @@ public class AppointmentPage extends JFrame {
 
         if (connection != null) {
             System.out.println("Connection established");
+            connection.setAutoCommit(false); // Start transaction
         }
 
         //test patietn ID
@@ -78,6 +79,25 @@ public class AppointmentPage extends JFrame {
             e.printStackTrace();
         }
 
+        try (Statement stmt3 = connection.createStatement()){
+            String query = "DELETE FROM Appointment WHERE patientID = '" + patientID + "'";
+            stmt3.executeUpdate(query);
+
+            String findWard = "select * from ward where patientID = '" + patientID + "'";
+            ResultSet corrResultSet = stmt3.executeQuery(findWard);
+
+            int firstWard = 0;
+            if (corrResultSet.next()){
+                firstWard = corrResultSet.getInt("wardID");
+                System.out.println("first Ward is " + firstWard);
+            }
+            String bookWard = "Update ward set occupied = true where wardID = '" + firstWard + "'";
+            
+            stmt3.executeUpdate(bookWard);
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+
         // String[] doctors = {"Doctor 1", "Doctor 2", "Doctor 3", "Doctor 4", "Doctor 5"};
         for (String doctor : doctorNames) {
             JPanel doctorButtonPanel = new JPanel(new BorderLayout());
@@ -108,7 +128,7 @@ public class AppointmentPage extends JFrame {
                     if (empIdResult.next()) {
                         empId = empIdResult.getString("employeeID");
                     }
-                    String query = "select * from Appointment where doctorID = '" + empId + "' and slot = '" + index + "'";
+                    String query = "select * from Appointment where doctorID = '" + empId + "' and slot = '" + index + "' and patientID != '" + patientID + "'";
                     ResultSet resultSet = stmt.executeQuery(query);
       
                     boolean isFound = false;
@@ -192,6 +212,7 @@ public class AppointmentPage extends JFrame {
                         stmt.executeUpdate(bookWard);
 
                         JOptionPane.showMessageDialog(null, "You have successfully booked an appointment!");
+                        connection.commit(); // Commit transaction
                         PatientPage patientPage = new PatientPage(patientID);
                         patientPage.setVisible(true);
                     } catch (SQLException e1) {
@@ -215,9 +236,9 @@ public class AppointmentPage extends JFrame {
         backButtonPanel.add(backButton, BorderLayout.EAST);
         backButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                PatientPage patientPage;
                 try {
-                    patientPage = new PatientPage(patientID);
+                    connection.rollback(); // Rollback transaction
+                    PatientPage patientPage = new PatientPage(patientID);
                     patientPage.setVisible(true);
                 } catch (SQLException e1) {
                     e1.printStackTrace();
@@ -230,7 +251,7 @@ public class AppointmentPage extends JFrame {
     public static void main(String[] args) {
         EventQueue.invokeLater(() -> {
             try {
-                AppointmentPage frame = new AppointmentPage(patientID);
+                ModifyAppointment frame = new ModifyAppointment(patientID);
                 frame.setVisible(true);
             } catch (Exception e) {
                 e.printStackTrace();

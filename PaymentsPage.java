@@ -1,6 +1,5 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -10,10 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PaymentsPage extends JFrame {
-    private String adminID;
+    private static String adminID;
 
     public PaymentsPage(String adminID) {
-        this.adminID = adminID;
+        PaymentsPage.adminID = adminID;
         setTitle("Payments Page");
         setSize(400, 400);
         setLocationRelativeTo(null);
@@ -44,16 +43,11 @@ public class PaymentsPage extends JFrame {
         JPanel navBar = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton backButton = new JButton("Back");
         navBar.add(backButton);
-        backButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dispose(); // Close the PaymentsPage window
-                try {
-                    new Admin(adminID).setVisible(true);
-                } catch (SQLException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                } // Open the Admin page
+        backButton.addActionListener(e -> {
+            try {
+                new Admin(adminID).setVisible(true);
+            } catch (SQLException e1) {
+                e1.printStackTrace();
             }
         });
         add(navBar, BorderLayout.NORTH);
@@ -89,7 +83,7 @@ public class PaymentsPage extends JFrame {
 
     public static void main(String[] args) {
         EventQueue.invokeLater(() -> {
-            new PaymentsPage("admin123").setVisible(true);
+            new PaymentsPage(adminID).setVisible(true);
         });
     }
 }

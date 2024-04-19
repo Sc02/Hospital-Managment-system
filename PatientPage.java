@@ -57,6 +57,7 @@ public class PatientPage extends JFrame {
             this.setVisible(false); // Hide the PatientPage
             LoginFrame loginFrame;
             try {
+                dispose();
                 loginFrame = new LoginFrame();
                 loginFrame.setVisible(true); // Show the LoginFrame
             } catch (SQLException e1) {
@@ -85,22 +86,125 @@ public class PatientPage extends JFrame {
         JButton pharmacyButton = new JButton("Visit our Store");
         pharmacyButton.setBounds(230, 50, 200, 30); // Position the Pharmacy button next to the Book Appointment button
         contentPane.add(pharmacyButton);
+        //pharmacy. 
+        pharmacyButton.addActionListener(e -> {
+            try {
+                PharmacyPage pharmacyPage = new PharmacyPage(patientID);
+                pharmacyPage.setVisible(true);
+            } catch (SQLException e1) {
+                e1.printStackTrace();
+            }
+        });
 
         // Create welcome user label with increased font size and centered
-        JLabel welcomeLabel = new JLabel("Welcome " + patientID);
+        JLabel welcomeLabel = new JLabel("Welcome " + patientID + " !");
         welcomeLabel.setBounds(20, 90, 200, 20);
         welcomeLabel.setFont(new Font("Arial", Font.BOLD, 16)); // Set font size and style
         welcomeLabel.setHorizontalAlignment(SwingConstants.CENTER); // Center the label
         contentPane.add(welcomeLabel);
 
+        //View current appointment
+        try (Statement stmt = connection.createStatement()) {
+            String empIdQuery = "SELECT * FROM Appointment WHERE patientID = '" + patientID + "'";
+            ResultSet empIdResult = stmt.executeQuery(empIdQuery);
+
+            String empId = ""; // Initialize empId
+            int bookedSlot = 0;
+            if (empIdResult.next()) {
+                empId = empIdResult.getString("doctorID");
+                bookedSlot = empIdResult.getInt("slot");
+                String getDoctor = "SELECT docName from Doctor where employeeID = '" + empId + "'";
+                ResultSet docResult = stmt.executeQuery(getDoctor);
+                String doctorName = "test";
+                if (docResult.next()) {
+                    doctorName = docResult.getString("docName");
+                }
+                String[] slotTimes = {"5 - 6 PM", "6 - 7 PM", "7 - 8 PM"}; 
+                System.out.println(" booked slot is " + bookedSlot);
+                System.out.println("Doctor Name is " + doctorName + " and slot is " + slotTimes[bookedSlot <= 2 ? bookedSlot : 2]);
+
+                //Display appointment   
+                JLabel appointmentLabel = new JLabel("Your appointment is with " + doctorName + " at " + slotTimes[bookedSlot <= 2 ? bookedSlot : 2]);
+                appointmentLabel.setBounds(60, 120, 600, 20);
+                contentPane.add(appointmentLabel);
+
+                JButton modifyAppointmentButton = new JButton("Modify Appointment");
+                modifyAppointmentButton.setBounds(450, 120, 150, 20);
+                contentPane.add(modifyAppointmentButton);
+                //functionality for modify
+                modifyAppointmentButton.addActionListener(e -> {
+                    try (Statement stmt1 = connection.createStatement()){
+                        // connection.setAutoCommit(false); // Start transaction
+                        // String query = "DELETE FROM Appointment WHERE patientID = '" + patientID + "'";
+                        // stmt1.executeUpdate(query);
+
+                        // String findWard = "select * from ward where patientID = '" + patientID + "'";
+                        // ResultSet corrResultSet = stmt1.executeQuery(findWard);
+
+                        // int firstWard = 0;
+                        // if (corrResultSet.next()){
+                        //     firstWard = corrResultSet.getInt("wardID");
+                        //     System.out.println("first Ward is " + firstWard);
+                        // }
+                        // String bookWard = "Update ward set occupied = true where wardID = '" + firstWard + "'";
+                        
+                        // stmt1.executeUpdate(bookWard);
+
+                        ModifyAppointment modifyAppointment = new ModifyAppointment(patientID);
+                        modifyAppointment.setVisible(true);
+                    } catch (SQLException e1) {
+                        e1.printStackTrace();
+                    }
+                });
+
+                //delete button
+                JButton deleteAppointmentButton = new JButton("Delete Appointment");
+                deleteAppointmentButton.setBounds(625, 120, 150, 20);
+                contentPane.add(deleteAppointmentButton);
+                //code
+                deleteAppointmentButton.addActionListener(e -> {
+                    try (Statement stmt2 = connection.createStatement()){
+                        String query = "DELETE FROM Appointment WHERE patientID = '" + patientID + "'";
+                        stmt2.executeUpdate(query);
+
+                        String findWard = "select * from ward where patientID = '" + patientID + "'";
+                        ResultSet corrResultSet = stmt2.executeQuery(findWard);
+
+                        int firstWard = 0;
+                        if (corrResultSet.next()){
+                            firstWard = corrResultSet.getInt("wardID");
+                            System.out.println("first Ward is " + firstWard);
+                        }
+                        String bookWard = "Update ward set occupied = true where wardID = '" + firstWard + "'";
+
+                        stmt2.executeUpdate(bookWard);
+
+                        JOptionPane.showMessageDialog(null, "Appointment deleted successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                        PatientPage patientPage = new PatientPage(patientID);
+                        patientPage.setVisible(true);
+                    } catch (SQLException e1) {
+                        e1.printStackTrace();
+                    }
+                });
+            }
+            else{
+                System.out.println("No appointment booked");
+            }
+            // String query = "INSERT INTO Appointment (patientID, doctorID, slot) VALUES ('" + patientID + "', '" + empId + "', '" + index + "')";
+            // stmt.executeUpdate(query);
+        } catch (SQLException e1) {
+            e1.printStackTrace();
+        }
+
+
         // Add a label saying "We'd love to hear from you" above the Doctor Name dropdown
         JLabel feedbackPromptLabel = new JLabel("We'd love to hear from you !!");
-        feedbackPromptLabel.setBounds(100, 140, 200, 20); // Position the label above the Doctor Name dropdown
+        feedbackPromptLabel.setBounds(100, 160, 200, 20); // Position the label above the Doctor Name dropdown
         contentPane.add(feedbackPromptLabel);
 
         // Create a panel for the Doctor Name dropdown and feedback section
         JPanel doctorFeedbackPanel = new JPanel();
-        doctorFeedbackPanel.setBounds(20, 130, 350, 200); // Adjust the size of the panel
+        doctorFeedbackPanel.setBounds(20, 150, 350, 200); // Adjust the size of the panel
         doctorFeedbackPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1)); // Add a titled border
         doctorFeedbackPanel.setLayout(null); // Use absolute layout
 
@@ -110,9 +214,9 @@ public class PatientPage extends JFrame {
         doctorFeedbackPanel.add(doctorNameLabel);
 
         ArrayList<String> doctorNames = new ArrayList<>();
-        try (Statement stmt = connection.createStatement()) {
+        try (Statement stmt3 = connection.createStatement()) {
             String query = "SELECT docName FROM Doctor";
-            ResultSet resultSet = stmt.executeQuery(query);
+            ResultSet resultSet = stmt3.executeQuery(query);
             while (resultSet.next()) {
                 doctorNames.add(resultSet.getString("docName"));
             }
@@ -141,10 +245,10 @@ public class PatientPage extends JFrame {
             String selectedDoctor = (String) doctorNameDropdown.getSelectedItem();
             String feedbackContent = feedbackTextField.getText();
 
-            try (Statement stmt = connection.createStatement()) {
+            try (Statement stmt4 = connection.createStatement()) {
                 // Retrieve the employeeID for the selected doctorName
                 String empIdQuery = "SELECT employeeID FROM Doctor WHERE docName = '" + selectedDoctor + "'";
-                ResultSet empIdResult = stmt.executeQuery(empIdQuery);
+                ResultSet empIdResult = stmt4.executeQuery(empIdQuery);
                 
                 String empId = ""; // Initialize empId
                 if (empIdResult.next()) {
@@ -153,7 +257,7 @@ public class PatientPage extends JFrame {
 
                 // Insert the feedback into the Feedback table
                 String insertFeedbackQuery = "INSERT INTO Feedback (patientID, employeeID, review) VALUES ('" + patientID + "', '" + empId + "', '" + feedbackContent + "')";
-                stmt.executeUpdate(insertFeedbackQuery);
+                stmt4.executeUpdate(insertFeedbackQuery);
                 
                 // Show pop-up message for successful feedback submission
                 JOptionPane.showMessageDialog(null, "Feedback submitted successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);

@@ -1,20 +1,21 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionListener;
+// import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DoctorsPage extends JFrame {
-    private String adminID;
+    private static String adminID;
 
     public DoctorsPage(String adminID) {
-        this.adminID = adminID;
+        DoctorsPage.adminID = adminID;
         setTitle("Doctors Page");
-        setSize(400, 400);
+        setSize(700, 700);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -41,11 +42,19 @@ public class DoctorsPage extends JFrame {
         // Navigation Bar
         JPanel navBar = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton backButton = new JButton("Back");
-        backButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dispose(); // Close the current DoctorsPage
-                new Admin(adminID).setVisible(true); // Open the Admin page
+        // backButton.addActionListener(new ActionListener() {
+        //     @Override
+        //     public void actionPerformed(ActionEvent e) {
+        //         dispose(); // Close the current DoctorsPage
+        //         new Admin(adminID).setVisible(true); // Open the Admin page
+        //     }
+        // });
+
+        backButton.addActionListener(e -> {
+            try {
+                new Admin(adminID).setVisible(true);
+            } catch (SQLException e1) {
+                e1.printStackTrace();
             }
         });
 
@@ -76,7 +85,7 @@ public class DoctorsPage extends JFrame {
 
     public static void main(String[] args) {
         EventQueue.invokeLater(() -> {
-            new DoctorsPage("admin123").setVisible(true);
+            new DoctorsPage(adminID).setVisible(true);
         });
     }
 }

@@ -134,6 +134,7 @@ public class PharmacyPage extends JFrame {
 
         buyButton.addActionListener(e -> {
             try (Statement stmt = connection.createStatement()) {
+                double totalPaymentAmount = 0.0; // Initialize total payment amount
                 for (int i = 0; i < finalResultCount; i++) {
                     int finalI = i; // Declare finalI inside the loop for lambda expression
                     JPanel medicinePanel = (JPanel) centerPanel.getComponent(i);
@@ -142,15 +143,25 @@ public class PharmacyPage extends JFrame {
                     if (quantity > 0) {
                         String updateQuery = "UPDATE Pharmacy SET maxNo = maxNo - " + quantity + " WHERE medName = '" + medNameList[finalI] + "'";
                         stmt.executeUpdate(updateQuery);
+                        totalPaymentAmount += quantity * priceList[finalI]; // Calculate total payment amount
                     }
                 }
-                JOptionPane.showMessageDialog(this, "Purchase made!");
+                // Insert payment record into paymentrecord table
+                if (totalPaymentAmount > 0) {
+                    String paymentQuery = "INSERT INTO paymentrecord (amount) VALUES (" + totalPaymentAmount + ")";
+                    stmt.executeUpdate(paymentQuery);
+                    JOptionPane.showMessageDialog(this, "Purchase and payment recorded successfully!");
+                } else {
+                    JOptionPane.showMessageDialog(this, "No purchase made.");
+                }
                 // Reset all count fields to 0
                 for (int i = 0; i < finalResultCount; i++) {
                     JPanel medicinePanel = (JPanel) centerPanel.getComponent(i);
                     JTextField countField = (JTextField) medicinePanel.getComponent(2); // Assuming countField is the third component in each medicinePanel
                     countField.setText("0");
                 }
+                totalCost = 0.0; // Reset total cost
+                updateTotalCost(0, true); // Update total cost display
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }

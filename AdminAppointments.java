@@ -4,6 +4,7 @@ import java.awt.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 
 public class AdminAppointments extends JFrame {
@@ -50,6 +51,18 @@ public class AdminAppointments extends JFrame {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        JButton backButton = new JButton("Back");
+        backButton.setBounds(650, 10, 120, 30);
+        backButton.addActionListener(e -> {
+            try {
+                dispose();
+                new Admin(adminID).setVisible(true);
+            } catch (SQLException e1) {
+                e1.printStackTrace();
+            }
+        });
+
+        mainPanel.add(backButton, BorderLayout.NORTH);
 
         add(mainPanel);
     }

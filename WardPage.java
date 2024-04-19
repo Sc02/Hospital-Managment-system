@@ -63,7 +63,8 @@ public class WardPage extends JFrame {
         try (Statement stmt =  connection.createStatement() ){
             String dropView = "DROP VIEW IF EXISTS DoctorAppointmentView";
             stmt.executeUpdate(dropView);
-            String createView = "CREATE VIEW DoctorAppointmentView AS select d.docName as docName, d.specialisation as specialisation, a.wardID as wardID from appointment a join doctor d on d.employeeID = a.doctorID where a.wardID is not NULL;";
+            String createView = "CREATE VIEW DoctorAppointmentView AS select d.docName as docName, d.specialisation as "+
+            "specialisation, a.wardID as wardID from appointment a join doctor d on d.employeeID = a.doctorID where a.wardID is not NULL;";
             stmt.executeUpdate(createView);
 
             String totWards = "select count(*) as totalWards from ward";
@@ -84,7 +85,7 @@ public class WardPage extends JFrame {
                 System.out.println("first Ward is " + avCount);
             }
 
-            JLabel totalDisplay = new JLabel("Total Wards: " + totalCount + " and Occupied Wards: " + (totalCount - avCount));
+            JLabel totalDisplay = new JLabel("Total Wards: " + totalCount + " and Free Wards: " + (totalCount - avCount));
             totalDisplay.setBounds(40, 50, 100, 50);
             contentPane.add(totalDisplay);
 
@@ -160,6 +161,7 @@ public class WardPage extends JFrame {
                 dispose(); // Close the current window
                 // Open the login page
                 try {
+                    dispose();
                     new LoginFrame().setVisible(true);
                 } catch (SQLException e1) {
                     e1.printStackTrace();

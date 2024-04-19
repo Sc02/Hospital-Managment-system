@@ -39,7 +39,7 @@ public class DoctorsFrame extends JFrame {
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 // Draw the background image
-                ImageIcon imageIcon = new ImageIcon("doctor_background.jpg");
+                ImageIcon imageIcon = new ImageIcon("HospitalManagement/src/Doctor_Background.jpg");
                 Image image = imageIcon.getImage();
                 g.drawImage(image, 0, 0, getWidth(), getHeight(), this);
             }
@@ -84,6 +84,7 @@ public class DoctorsFrame extends JFrame {
             System.out.println(e);
         }
 
+        
         for (int i = 0; i < 3; i++) {
             String timeSlot = timeSlots[i];
             JButton timeSlotButton = new JButton(timeSlot);
@@ -101,6 +102,11 @@ public class DoctorsFrame extends JFrame {
                     desiredWard = Integer.parseInt(WardResultSet.getString("wardID"));
                     System.out.println("des ward " + desiredWard);
                     JLabel wardOption = new JLabel(String.valueOf(desiredWard));
+                    wardOption.setBounds(250, yPos - 40, 150, 30);
+                    contentPane.add(wardOption);
+                }
+                else {
+                    JLabel wardOption = new JLabel("No Appointments");
                     wardOption.setBounds(250, yPos - 40, 150, 30);
                     contentPane.add(wardOption);
                 }

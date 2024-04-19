@@ -123,7 +123,7 @@ public class LoginFrame extends JFrame {
                         dispose();
         
                         // Depending on the user type, open the corresponding frame
-                        if (enteredUsername.startsWith("e")) {
+                        if (enteredUsername.startsWith("p")) {
                             EventQueue.invokeLater(() -> {
                                 try {
                                     PatientPage patientPage = new PatientPage(enteredUsername);
@@ -144,7 +144,9 @@ public class LoginFrame extends JFrame {
                         } else if (enteredUsername.startsWith("d")) {
                             DoctorsFrame docPage = new DoctorsFrame(enteredUsername);
                             docPage.setVisible(true);
-                        }
+                        } else {
+                                    JOptionPane.showMessageDialog(null, "Invalid Username");
+                                }
                     } else {
                         // Authentication failed
                         JOptionPane.showMessageDialog(null, "Invalid username or password.", "Login Failed", JOptionPane.ERROR_MESSAGE);
@@ -186,7 +188,7 @@ public class LoginFrame extends JFrame {
                         LoginFrame.this.setVisible(false); // Hide LoginFrame
                         SwingUtilities.invokeLater(() -> {
                             try {
-                                if (enteredUsername.startsWith("e")) {
+                                if (enteredUsername.startsWith("p")) {
                                     PatientPage patientPage = new PatientPage(finalEnteredUsername);
                                     patientPage.setVisible(true);
                                 } else if (enteredUsername.startsWith("a")) {
@@ -195,6 +197,9 @@ public class LoginFrame extends JFrame {
                                 } else if (enteredUsername.startsWith("d")) {
                                     DoctorsFrame docPage = new DoctorsFrame(finalEnteredUsername);
                                     docPage.setVisible(true);
+                                }
+                                else {
+                                    JOptionPane.showMessageDialog(null, "Invalid Username");
                                 }
                             } catch (Exception e1) {
                                 e1.printStackTrace();
